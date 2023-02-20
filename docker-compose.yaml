@@ -1,0 +1,43 @@
+version: '3'
+services:
+  keycloak-postgres:
+    image: postgres:latest
+    volumes:
+      - ./postgres:/var/lib/postgresql/data
+    restart: 'always'
+    environment:
+      POSTGRES_USER: ypur-db-username
+      POSTGRES_PASSWORD: yourpassword
+      POSTGRES_DB: keycloak
+      POSTGRES_HOST: keycloak-postgres(postgres-container-name)
+    networks:
+      - your-webserver-network
+  keycloak:
+    image: quay.io/keycloak/keycloak:18.0.0
+    entrypoint: /bin/bash
+    command: -c "/keycloak/start.sh"
+    volumes:
+      - ./envs:/vault/envs
+      - ./start.sh:/keycloak/start.sh
+      - ./certs:/opt/keycloak/conf/
+    environment:
+      KC_HTTPS_CERTIFICATE_FILE: /opt/keycloak/conf/cert.pem
+      KC_HTTPS_CERTIFICATE_KEY_FILE: /opt/keycloak/conf/privkey.pem
+      KC_CACHE: ispn
+      KC_DB: postgres
+      KC_DB_URL_DATABASE: keycloak
+      KC_DB_URL_HOST: keycloak-postgres(postgres-container-name)
+      KC_DB_URL_PORT: 5432
+      KC_HOSTNAME: your-keycloak-domain-name
+      KC_HOSTNAME_PATH: odic
+      KC_HTTP_RELATIVE_PATH: odic
+      PROXY_ADDRESS_FORWARDING: 'true'
+      KC_PROXY: passthrough
+      KC_HTTPS_PORT: 443
+    depends_on:
+      - keycloak-postgres(postgres-container-name)
+    networks:
+      - your-webserver-network
+networks:
+  your-webserver-network:
+    external: true
