@@ -1,0 +1,4 @@
+export KEYCLOAK_ADMIN_PASSWORD=your-keycloak-password
+export KEYCLOAK_ADMIN=your-keycloak-user-name
+export KC_DB_USERNAME=your-keycloak-db-user-name
+export KC_DB_PASSWORD=your-keycloak-db-password
